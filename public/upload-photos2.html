@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/fontawesome/css/all.css" />
+    <title>Document</title>
+    <style>
+      .imgUnit {
+        position: relative;
+        display: inline-block;
+        width: 250px;
+      }
+      .imgUnit > img {
+        width: 100%;
+      }
+      .imgUnit > .del {
+        color: red;
+        font-size: xx-large;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <form name="form1" onsubmit="sendData(event)">
+      <input type="text" name="testFiled1" value="測試" />
+      <br />
+      <input type="file" name="photos" multiple accept="image/jpeg,image/png" />
+      <br />
+      <input type="submit" />
+    </form>
+
+    <div id="imgContainer">
+<!--
+      <div class="imgUnit">
+        <div class="del"><i class="fa-solid fa-circle-xmark"></i></div>
+        <img src="/uploads/43a7647e-9637-4247-a035-8b136d3a265c.jpg" alt="" />
+      </div>
+    -->
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script>
+      
+      const imgContainer = $('#imgContainer');
+
+      async function sendData(event) {
+        event.preventDefault(); // 不要用傳統的表單送出
+
+        // console.log(document.form1.photos.files)
+        const fd = new FormData(document.form1);
+
+        const data = await fetch("/try-uploads", {
+          method: "POST",
+          body: fd,
+        }).then((r) => r.json());
+
+        console.log(data);
+
+        const html = renderImgs(data.files);
+
+        imgContainer.append(html);
+
+      }
+
+      function renderImgs(imgData){
+        return imgData.map(el=>{
+          return `
+          <div class="imgUnit" data-id="${el.filename}">
+            <div class="del" onclick="removeItem(event)">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <img src="/uploads/${el.filename}" alt="" />
+          </div>
+          `;
+        }).join('')
+      }
+
+      function removeItem(event){
+        $(event.currentTarget).closest('.imgUnit').remove();
+      }
+
+      function getData(){
+        let data = [];
+        $('.imgUnit', imgContainer).each(function(){
+          data.push( $(this).attr('data-id') );
+        })
+        console.log(data);
+        return data;
+      }
+
+    // 其餘運算子
+    //   function test01(...ar) {}
+
+    //   const [b1, ...b2] = [1, 2, 3, 4, 5];
+    //   console.log({ b2 });
+
+    //   let c = 5, d = 10;
+    //   [c, d] = [d, c];
+    //   console.log({ c, d });
+    // </script>
+  </body>
+</html>

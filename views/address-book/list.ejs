@@ -1,0 +1,99 @@
+<%- include('../parts/html-head') %>
+<%- include('../parts/navbar') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-4 offset-8">
+      <form class="d-flex" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" name="search" aria-label="Search" value="<%= search ? search : '' %>">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <% 
+          const qo = {...queryObj};
+          
+          for(let i=page-5; i<=page+5; i++)
+          if(i>=1 && i<= totalPages)
+          { 
+            qo.page = i;
+            %>
+          <li class="page-item <%= i===page ? 'active' : '' %>">
+            <a class="page-link" href="?<%= new URLSearchParams(qo).toString() %>"><%= i %></a>
+          </li>
+          <% }  %>
+        </ul>
+      </nav>
+
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col">
+      <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th scope="col"><i class="fa-solid fa-bomb"></i></th>
+            <th scope="col">#</th>
+            <th scope="col">姓名</th>
+            <th scope="col">電郵</th>
+            <th scope="col">手機</th>
+            <th scope="col">生日</th>
+            <th scope="col">地址</th>
+            <th scope="col"><i class="fa-solid fa-file-pen"></i></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for(let r of rows){ %>
+          <tr>
+            <td>
+              <a href="javascript: deleteItem(<%= r.sid %>)">
+                <i class="fa-solid fa-bomb"></i>
+              </a>
+            </td>
+            <td><%= r.sid %></td>
+            <td><%= r.name %></td>
+            <td><%= r.email %></td>
+            <td><%= r.mobile %></td>
+            <!--
+            <td><%= myToDateString(r.birthday) %></td>
+            -->
+            <td><%= r.birthday2 %></td>
+            <td><%= r.address %></td>
+            <td>
+              <a href="/address-book/edit/<%= r.sid %>">
+                <i class="fa-solid fa-file-pen"></i>
+              </a>
+            </td>
+          </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('../parts/script') %>
+<script>
+  async function deleteItem(sid){
+    if(! confirm(`是否要刪除編號為 ${sid} 的資料?`)) return;
+    const r = await fetch(`/address-book/${sid}`, {
+      method: 'DELETE'
+    });
+    const result = await r.json();
+
+    console.log(JSON.stringify(result));
+    location.reload(); // 重整頁面
+  }
+
+
+
+</script>
+<%- include('../parts/html-foot') %>

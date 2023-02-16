@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>async-await03</title>
+  </head>
+  <body>
+    <script>
+      function myPromise(str) {
+        const rnd = 500 + Math.floor(Math.random() * 1000);
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(str + ":" + rnd);
+          }, rnd);
+        });
+      }
+      //在這種狀態下,會呈現交錯狀態
+      (async () => {
+        for (let i = 0; i < 10; i++) {
+          console.log(await myPromise("a" + i));
+        }
+      })().then(() => {
+        console.log("a:完成");
+      });
+      (async () => {
+        for (let i = 0; i < 10; i++) {
+          console.log(await myPromise("b" + i));
+        }
+      })().then(() => {
+        console.log("b:完成");
+      });
+    </script>
+  </body>
+</html>

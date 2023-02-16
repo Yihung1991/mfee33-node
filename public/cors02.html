@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button onclick="loadData()">load data</button>
+  <pre id="info"></pre>
+
+
+  <script>
+    async function loadData(){
+      const r = await fetch(`${location.protocol}//${location.hostname}:3002/try-sess`, {
+        credentials: "include"
+      });
+      const data = await r.json();
+
+      document.querySelector('#info').innerHTML = JSON.stringify(data, null, 4);
+    }
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<%- include('parts/html-head') %> 
+<%- include('parts/navbar') %>
+<div class="container">
+  <div class="row">
+    <div class="d-flex ms-4 col-3">
+      <form method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3">
+          <label for="account" class="form-label">account</label>
+          <input type="text" class="form-control" id="account" name="account" />
+          <div class="form-text">
+            <%= typeof account==='undefined'? '': account %>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="text" class="form-control" id="password" name="password"/>
+          <div class="form-text"><%= locals.password ? password : '' %></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <textarea cols="50" rows="10"><%- JSON.stringify(locals) %></textarea>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('parts/script') %>
+<%- include('parts/html-foot') %>

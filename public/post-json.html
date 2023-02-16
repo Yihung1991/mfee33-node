@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button onclick="sendData()">send</button>
+    <div id="info"></div>
+
+    <script>
+      async function sendData() {
+        const r = await fetch("/try-post", {
+          method: "POST",
+          body: JSON.stringify({ name: "flora", age: 23 }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await r.json();
+        console.log(data);
+        info.innerText = data.body.name;
+      }
+    </script>
+  </body>
+</html>

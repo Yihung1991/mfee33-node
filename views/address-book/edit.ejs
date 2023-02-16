@@ -1,0 +1,108 @@
+<%- include('../parts/html-head') %>
+<%- include('../parts/navbar') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">編輯資料</h5>
+
+          <form name="form1" method="post" onsubmit="sendData(event)">
+            <div class="mb-3">
+              <label for="name" class="form-label">name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+                value="<%= name %>"
+                
+              />
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">email</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                value="<%= email %>"
+                
+              />
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="mobile" class="form-label">mobile</label>
+              <input
+                type="text"
+                class="form-control"
+                id="mobile"
+                name="mobile"
+                pattern="09\d{2}-?\d{3}-?\d{3}"
+                value="<%= mobile %>"
+                
+              />
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="birthday" class="form-label">birthday</label>
+              <input
+                type="date"
+                class="form-control"
+                id="birthday"
+                name="birthday"
+                value="<%= myToDateString(birthday) %>"
+                
+              />
+              <div class="form-text"></div>
+            </div>
+            <div class="mb-3">
+              <label for="address" class="form-label">address</label>
+              <input
+                type="text"
+                class="form-control"
+                id="address"
+                name="address"
+                value="<%= address %>"
+              />
+              <div class="form-text"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">修改</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../parts/script') %>
+<script>
+  async function sendData(event) {
+    event.preventDefault();
+
+    // TODO: 檢查表單各欄位的資料
+
+    const fd = new FormData(document.form1);
+
+    const r = await fetch("", {
+      method: "PUT",
+      body: fd, // multipart/form-data
+    });
+
+    const data = await r.json();
+
+    console.log(data);
+    if (data.success) {
+      alert("修改成功");
+      location.href = "/address-book";
+    } else {
+      alert("資料沒有修改!");
+    }
+  }
+</script>
+
+<%- include('../parts/html-foot') %>
