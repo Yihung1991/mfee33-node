@@ -165,11 +165,11 @@ app.get('/getData',(async(req,res)=>{
   res.json(data)
 }))
 
-app.get('/address-book/api',(async(req,res)=>{
-  const sql = 'SELECT * FROM `address_book` WHERE 1'
-  const [data]= await db.query(sql)
-  res.json(data)
-}))
+// app.get('/address-book/api',(async(req,res)=>{
+//   const sql = 'SELECT * FROM `address_book` WHERE 1'
+//   const [data]= await db.query(sql)
+//   res.json(data)
+// }))
 
 
 

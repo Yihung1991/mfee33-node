@@ -1,13 +1,13 @@
 const express = require("express");
-const db = require("./../modules/db_connect2");
 const moment = require("moment-timezone");
+const db = require("./../modules/db_connect2");
 const upload = require("./../modules/upload-imgs");
 const router = express.Router();
 
 router.use((req, res, next) => {
-  if (!req.session.admin) {
+  /*if (!req.session.admin) {
     return res.redirect("/login");
-  }
+  }*/
   next();
 });
 
@@ -16,7 +16,7 @@ const getListData = async (req, res) => {
   let redirect = "";
   const perPage = 25;
   let page = +req.query.page || 1;
-  page = parseInt(page);
+  // page = parseInt(page);
 
   let queryObj = {};
   let sqlWhere = "WHERE 1";
@@ -28,11 +28,12 @@ const getListData = async (req, res) => {
     sqlWhere += ` AND\`name\`LIKE ${searchEsc}`;
     queryObj = { ...queryObj, search };
   }
-  console.log({sqlWhere});
+  // console.log({sqlWhere});
   res.locals.search = search; //傳到ejs
   res.locals.queryObj = queryObj; //傳到ejs
 
   page = parseInt(page);
+
   if (page < 1) {
     redirect = req.baseUrl; //轉向別頁
   }
@@ -43,7 +44,7 @@ const getListData = async (req, res) => {
   );
   //總頁數
   const totalPages = Math.ceil(totalRows / perPage);
-  let row = [];
+  let rows = [];
   if (totalRows > 0) {
     if (page > totalPages) {
       redirect = req.baseUrl + `?page=` + totalPages;
