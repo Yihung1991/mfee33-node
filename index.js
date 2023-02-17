@@ -159,6 +159,20 @@ app.get("/try-db", async (req, res) => {
   res.json(rows);
 });
 
+app.get('/getData',(async(req,res)=>{
+  const sql = 'SELECT * FROM `sessions` WHERE 1'
+  const [data]= await db.query(sql)
+  res.json(data)
+}))
+
+app.get('/address-book/api',(async(req,res)=>{
+  const sql = 'SELECT * FROM `address_book` WHERE 1'
+  const [data]= await db.query(sql)
+  res.json(data)
+}))
+
+
+
 app.use("/address-book", require("./routes/address-book"));
 
 app.get("/login", async (req, res) => {
