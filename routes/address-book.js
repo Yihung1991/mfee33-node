@@ -148,9 +148,24 @@ router.put("/edit/:sid", upload.none(), async (req, res) => {
 });
 
 router.delete("/:sid", async (req, res) => {
-  const sql = "DELETE FROM address_book WHERE sid=?";
-  const [result] = await db.query(sql, [req.params.sid]);
-  res.json(result);
+  const output = {
+    success: false,
+    error: "",
+  };
+  //console.log("res.locals.bearer:", res.locals.bearer);
+
+  if (res.locals.bearer.sid && res.locals.bearer.account) {
+    //req.params.sid
+    const sql = "DELETE FROM address_book WHERE sid=?";
+    const [result] = await db.query(sql, [req.params.sid]);
+    output.success = !!result.affectedRows;
+    output.error = output.success ? "" : "刪除發生錯誤";
+  } else {
+    output.error = "沒有權限做刪除";
+  }
+  /*const sql = "DELETE FROM address_book WHERE sid=?";
+  const [result] = await db.query(sql, [req.params.sid]);*/
+  res.json(output);
 });
 
 router.get("/", async (req, res) => {

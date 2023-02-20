@@ -10,10 +10,11 @@ if (process.argv[2] && process.argv[2] === "production") {
 
 const express = require("express");
 const session = require("express-session");
+const jwt = require("jsonwebtoken");
 const MysqlStore = require("express-mysql-session")(session);
 const moment = require("moment-timezone");
 const cors = require("cors");
-const bcrypt = require('bcryptjs');
+const bcrypt = require("bcryptjs");
 // const multer = require("multer");
 // const upload = multer({ dest: "tmp_uploads/" });
 const upload = require("./modules/upload-imgs");
@@ -50,7 +51,6 @@ const corsOption = {
 };
 app.use(cors(corsOption));
 
-
 app.use((req, res, next) => {
   res.locals.title = "Groot的網頁";
   res.locals.pageName = "";
@@ -60,6 +60,17 @@ app.use((req, res, next) => {
   res.locals.myToDatetimeString = (d) =>
     moment(d).format("YYYY-MM-DD HH:mm:ss");
   res.locals.session = req.session; //把session資料傳給ejs使用
+  res.locals.bearer = {}; // 預設值
+  // 取得 headers 裡的 Authorization
+  let auth = req.get("Authorization");
+  if (auth && auth.indexOf("Bearer ") === 0) {
+    auth = auth.slice(7); // token
+    try {
+      res.locals.bearer = jwt.verify(auth, process.env.JWT_SECRET);
+    } catch (ex) {}
+  }
+  console.log("res.locals.bearer:", res.locals.bearer);
+
   next();
 });
 //ejs呼叫方式:render
@@ -159,19 +170,17 @@ app.get("/try-db", async (req, res) => {
   res.json(rows);
 });
 
-app.get('/getData',(async(req,res)=>{
-  const sql = 'SELECT * FROM `sessions` WHERE 1'
-  const [data]= await db.query(sql)
-  res.json(data)
-}))
+app.get("/getData", async (req, res) => {
+  const sql = "SELECT * FROM `sessions` WHERE 1";
+  const [data] = await db.query(sql);
+  res.json(data);
+});
 
 // app.get('/address-book/api',(async(req,res)=>{
 //   const sql = 'SELECT * FROM `address_book` WHERE 1'
 //   const [data]= await db.query(sql)
 //   res.json(data)
 // }))
-
-
 
 app.use("/address-book", require("./routes/address-book"));
 
@@ -180,45 +189,62 @@ app.get("/login", async (req, res) => {
 });
 app.post("/login", async (req, res) => {
   const output = {
-    success:false,
-    error:'帳號密碼有錯誤',
-    code:0,
-    postData:req.body,
-  }
+    success: false,
+    error: "帳號密碼有錯誤",
+    code: 0,
+    postData: req.body,
+    token: "",
+  };
 
-  const sql = 'SELECT * FROM admins WHERE account=?';
+  const sql = "SELECT * FROM admins WHERE account=?";
 
   const [rows] = await db.query(sql, [req.body.account]);
-  if(! rows.length){
+  if (!rows.length) {
     // 帳號是錯的
     output.code = 401;
     return res.json(output);
   }
+  let passwordCorrect = false; // 預設密碼是錯的
+  try {
+    passwordCorrect = await bcrypt.compare(
+      req.body.password,
+      rows[0].password_hash
+    );
+  } catch (ex) {}
 
-  if(! await bcrypt.compare(req.body.password, rows[0].password_hash)){
+  if (!passwordCorrect) {
     // 密碼是錯的
     output.code = 402;
   } else {
     output.success = true;
     output.code = 200;
-    output.error = '';
+    output.error = "";
 
     req.session.admin = {
       sid: rows[0].sid,
       account: rows[0].account,
-    }
+    };
+    output.token = jwt.sign(
+      {
+        sid: rows[0].sid,
+        account: rows[0].account,
+      },
+      process.env.JWT_SECRET
+    );
+    output.accountId = rows[0].sid;
+    output.account = rows[0].account;
   }
   res.json(output);
 });
-app.get('/logout', async (req, res) => {
+app.get("/logout", async (req, res) => {
   delete req.session.admin;
-  res.redirect('/'); // 登出後跳到首頁
+  res.redirect("/"); // 登出後跳到首頁
 });
 
-app.get('/hash', async (req, res) => {
-  const p = req.query.p || '123456';
+app.get("/hash", async (req, res) => {
+  const p = req.query.p || "123456";
   const hash = await bcrypt.hash(p, 10);
-  res.json({hash}); 
+  res.json({ hash });
 });
 
 app.use(express.static("public"));
