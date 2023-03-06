@@ -1,3 +1,4 @@
+//先判斷是「測試環境」還是「正式環境」,設定在package.json裡面
 if (process.argv[2] && process.argv[2] === "production") {
   require("dotenv").config({
     path: "./production.env",
@@ -73,6 +74,10 @@ app.use((req, res, next) => {
 
   next();
 });
+
+
+// ***********************路由設定********************
+
 //ejs呼叫方式:render
 app.get("/", (req, res) => {
   // res.send('Hello World');
@@ -83,8 +88,8 @@ app.get("/", (req, res) => {
 app.get("/sales-json", (req, res) => {
   //設定檔案名稱
   const sales = require(__dirname + "/data/sales");
-  //res.json(sales);//呼叫json方式
-  res.render("sales-json", { sales, title: "業務員資料" });
+  //res.json(sales); //用json格式輸出
+  res.render("sales-json", { sales, title: "業務員資料" });//render是給ejs使用的
 });
 
 //取queryString
@@ -247,6 +252,7 @@ app.get("/hash", async (req, res) => {
   res.json({ hash });
 });
 
+//引用外掛可以多個
 app.use(express.static("public"));
 app.use(express.static("node_modules/bootstrap/dist"));
 // app.use(express.static('node_modules/@fortawesome/fontawesome-free'));

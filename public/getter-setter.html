@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      class person {
+        _myId = "A007";
+        #_myId = "A007"; // 私有屬性前面以 # 開頭
+        constructor(name = "", id = "") {
+          this.name = name;
+          this._myId = id;
+          this.#_myId = id;
+        }
+
+        //get 只能讀取
+        get myId() {
+          return this._myId;
+          return this.#_myId;
+        }
+
+        //set 可以將讀取內容做更改
+        set myId(val) {
+          this._myId = val;
+        }
+      }
+
+      const p = new person("bill", "B008");
+
+      console.log(p.name);
+      console.log(p.myId);
+
+      p.myId = "C005";
+      console.log(p.myId);
+    </script>
+  </body>
+</html>

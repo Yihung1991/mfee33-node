@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "//_dev": "啟動方式:npm run dev/nodemon start",
     "dev": "nodemon index.js dev",
     "start": "node index.js production",
     "test": "echo \"Error: no test specified\" && exit 1"
