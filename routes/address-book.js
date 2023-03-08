@@ -42,7 +42,7 @@ const getListData = async (req, res) => {
   const [[{ totalRows }]] = await db.query(
     `SELECT COUNT(1) totalRows FROM address_book ${sqlWhere}`
   );
-  //總頁數
+  //總頁數(做分頁)
   const totalPages = Math.ceil(totalRows / perPage);
   let rows = [];
   if (totalRows > 0) {

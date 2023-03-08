@@ -27,6 +27,10 @@ const app = express();
 //設定樣板引擎ejs
 app.set("view engine", "ejs");
 
+
+//top-level middlewares(中介軟體:資料庫以及應用程式的溝通橋樑),只要在index.js(入口)設定就好
+
+//top-level middlewares設定session
 app.use(
   session({
     saveUninitialized: false,
@@ -39,10 +43,13 @@ app.use(
   })
 );
 
-//top-level middlewares(中介軟體:資料庫以及應用程式的溝通橋樑)
-//body-parser 是一個很好用的middlewares，可以幫助我們解析(parser)不同格式的請求資料
+//top-level middlewares解析urlencoded(body-parser)
 app.use(express.urlencoded({ extended: false }));
+
+//top-level middlewares解析json(body-parser)
 app.use(express.json());
+
+//top-level middlewares cors
 const corsOption = {
   credentials: true,
   origin: function (origin, callback) {
@@ -62,6 +69,7 @@ app.use((req, res, next) => {
     moment(d).format("YYYY-MM-DD HH:mm:ss");
   res.locals.session = req.session; //把session資料傳給ejs使用
   res.locals.bearer = {}; // 預設值
+
   // 取得 headers 裡的 Authorization
   let auth = req.get("Authorization");
   if (auth && auth.indexOf("Bearer ") === 0) {
@@ -104,12 +112,6 @@ app.post(["/try-post", "/try-post1"], (req, res) => {
     body: req.body,
   });
 });
-//原本的寫法
-//用法:讓資料進入時先解析,所以要把他們放到最上面
-// const urlencodedParser = express.urlencoded({extended: false});
-// app.post('/try-post', urlencodedParser, (req, res) => {
-// res.json(req.body);
-// });
 
 app.get("/try-post-form", (req, res) => {
   res.render("try-post-form");
@@ -150,7 +152,7 @@ app.get(/\/m\/09\d{2}-?\d{3}-?\d{3}$/i, () => {
   res.send({ u });
 });
 
-app.use(require("./routes/admin2")); //router當作middleware
+app.use(require("./routes/admin")); //router當作middleware
 
 app.get("/try-sess", (req, res) => {
   req.session.myVar = req.session.myVar || 0;
@@ -170,10 +172,14 @@ app.get("/try-moment", (req, res) => {
   });
 });
 
+//測試是否有連線到MySQL
 app.get("/try-db", async (req, res) => {
   const [rows] = await db.query("SELECT * FROM address_book LIMIT 5");
   res.json(rows);
 });
+
+//用use()串接routes的address-book
+app.use("/address-book", require("./routes/address-book"));
 
 app.get("/getData", async (req, res) => {
   const sql = "SELECT * FROM `sessions` WHERE 1";
@@ -181,13 +187,7 @@ app.get("/getData", async (req, res) => {
   res.json(data);
 });
 
-// app.get('/address-book/api',(async(req,res)=>{
-//   const sql = 'SELECT * FROM `address_book` WHERE 1'
-//   const [data]= await db.query(sql)
-//   res.json(data)
-// }))
 
-app.use("/address-book", require("./routes/address-book"));
 
 app.get("/login", async (req, res) => {
   res.render("login"); // 呈現登入的表單
